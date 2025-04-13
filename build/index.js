@@ -2,4 +2,4 @@ import pkg from 'lodash';
 const { add } = pkg;
 
 export { add };
-// sы
+// sыы
