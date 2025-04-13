@@ -24,29 +24,35 @@ jobs:
             - name: Install dependencies
               run: npm ci
 
-            - name: Check version change
+            - name: Check the version
+              id: check
               run: |
-                  # Получаем текущую версию из package.json
-                  CURRENT_VERSION=$(node -p "require('./package.json').version")
+                  CURRENT_VERSION=$(jq -r .version package.json)
                   echo "Current version: $CURRENT_VERSION"
+                  LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+                  echo "Latest tag: $LATEST_TAG"
 
-                  # Проверяем, существует ли предыдущий коммит
-                  if git rev-parse HEAD~1 >/dev/null 2>&1; then
-                      # Извлекаем версию package.json из предыдущего коммита.
-                      PREV_VERSION=$(git show HEAD~1:package.json | grep '"version":' | head -1 | sed 's/.*"\(.*\)".*/\1/')
-                      echo "Previous version: $PREV_VERSION"
+                  LATEST_VERSION=${LATEST_TAG#v}
 
-                      if [ "$CURRENT_VERSION" = "$PREV_VERSION" ]; then
-                      echo "Error: Version ($CURRENT_VERSION) has not been updated!"
-                      exit 1
-                      else
-                      echo "Version updated successfully: $PREV_VERSION -> $CURRENT_VERSION"
-                      fi
+                  if [ "$LATEST_VERSION" != "$CURRENT_VERSION" ]; 
+                  then
+                  echo "Version changed"
+                  echo "version_changed=true" >> $GITHUB_OUTPUT
+                  echo "new_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
                   else
-                      echo "No previous commit found, skipping version check."
+                  echo "Version not changed"
+                  echo "version_changed=false" >> $GITHUB_OUTPUT
                   fi
 
             - name: Publish to NPM
               run: npm publish
               env:
                   NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+
+            - name: Tag release
+              if: steps.check.outputs.version_changed == 'true'
+              run: |
+                  git config --local user.email "github-actions[bot]@users.noreply.github.com"
+                  git config --local user.name "github-actions[bot]"
+                  git tag -a "v${{ steps.check.outputs.new_version }}" -m "v${{ steps.check.outputs.new_version }}"
+                  git push origin "v${{ steps.check.outputs.new_version }}"
