@@ -7,8 +7,13 @@
     "test": "node build/index.js",
     "build": "node build/index.js"
   },
-  "author": "",
+  "author": "Artur Bielan",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Belartale/test-github-actions"
+  },
+  "homepage": "https://github.com/Belartale/test-github-actions",
   "description": "",
   "dependencies": {
     "lodash": "^4.17.21"
