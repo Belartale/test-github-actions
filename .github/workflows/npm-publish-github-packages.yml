@@ -61,7 +61,7 @@ jobs:
                   echo "secrets.EMAIL: ${{ secrets.EMAIL }}"
                   echo "secrets.NAME: ${{ secrets.NAME }}"
 
-                  git config --local user.email "${{ secrets.EMAIL }}"
-                  git config --local user.name "${{ secrets.NAME }}"
+                  git config --local user.email "belartale@gmail.com"
+                  git config --local user.name "belartale"
                   git tag -a "v${{ steps.check.outputs.new_version }}" -m "v${{ steps.check.outputs.new_version }}"
                   git push origin "v${{ steps.check.outputs.new_version }}"
