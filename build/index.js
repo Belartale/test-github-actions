@@ -1,1 +1,3 @@
-export const add = (a, b) => a + b;
+import { add } from 'lodash';
+
+export { add };
