@@ -46,7 +46,7 @@ jobs:
                   fi
 
             - name: Build
-              run: pnpm build
+              run: npm build
               if: steps.check.outputs.version_changed == 'true'
 
             - name: Publish
