@@ -52,8 +52,15 @@ jobs:
             - name: Tag release
               if: steps.check.outputs.version_changed == 'true'
               run: |
-                  echo "GITHUB_USER_EMAIL: ${{ env.EMAIL }}"
-                  echo "GITHUB_USER_NAME: ${{ env.NAME }}"
+                  echo "github.EMAIL: ${{ github.EMAIL }}"
+                  echo "github.NAME: ${{ github.NAME }}"
+
+                  echo "env.EMAIL: ${{ env.EMAIL }}"
+                  echo "env.NAME: ${{ env.NAME }}"
+
+                  echo "secrets.EMAIL: ${{ secrets.EMAIL }}"
+                  echo "secrets.NAME: ${{ secrets.NAME }}"
+
                   git config --local user.email "${{ secrets.EMAIL }}"
                   git config --local user.name "${{ secrets.NAME }}"
                   git tag -a "v${{ steps.check.outputs.new_version }}" -m "v${{ steps.check.outputs.new_version }}"
