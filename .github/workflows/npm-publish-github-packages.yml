@@ -30,16 +30,20 @@ jobs:
                   CURRENT_VERSION=$(node -p "require('./package.json').version")
                   echo "Current version: $CURRENT_VERSION"
 
-                  # Извлекаем версию package.json из предыдущего коммита.
-                  # Предполагается, что package.json присутствует и в предыдущем коммите.
-                  PREV_VERSION=$(git show HEAD~1:package.json | grep '"version":' | head -1 | sed 's/.*"\(.*\)".*/\1/')
-                  echo "Previous version: $PREV_VERSION"
+                  # Проверяем, существует ли предыдущий коммит
+                  if git rev-parse HEAD~1 >/dev/null 2>&1; then
+                      # Извлекаем версию package.json из предыдущего коммита.
+                      PREV_VERSION=$(git show HEAD~1:package.json | grep '"version":' | head -1 | sed 's/.*"\(.*\)".*/\1/')
+                      echo "Previous version: $PREV_VERSION"
 
-                  if [ "$CURRENT_VERSION" = "$PREV_VERSION" ]; then
+                      if [ "$CURRENT_VERSION" = "$PREV_VERSION" ]; then
                       echo "Error: Version ($CURRENT_VERSION) has not been updated!"
                       exit 1
-                  else
+                      else
                       echo "Version updated successfully: $PREV_VERSION -> $CURRENT_VERSION"
+                      fi
+                  else
+                      echo "No previous commit found, skipping version check."
                   fi
 
             - name: Publish to NPM
