@@ -54,9 +54,8 @@ jobs:
             - uses: googleapis/release-please-action@v4
               id: release
               with:
-                  token: ${{ secrets.TEST_TOKEN }}
+                  token: ${{ secrets.GITHUB_TOKEN }}
                   release-type: node
-                  target-branch: ${{ github.ref_name }}
 
             - name: Setup Node.js
               uses: actions/setup-node@v4
