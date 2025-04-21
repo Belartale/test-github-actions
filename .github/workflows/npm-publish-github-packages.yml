@@ -35,12 +35,12 @@ jobs:
                   CURRENT_VERSION=$(jq -r .version package.json)
                   echo "Current version: $CURRENT_VERSION"
 
-                  LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "null")
+                  LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
                   echo "Latest tag: $LATEST_TAG"
 
                   LATEST_VERSION=${LATEST_TAG#v}
 
-                  if [ "$LATEST_VERSION" != "$CURRENT_VERSION" && "$LATEST_VERSION" != "null"];
+                  if [ "$LATEST_VERSION" != "$CURRENT_VERSION" && "$LATEST_VERSION" != "v0.0.0"];
                   then
                   echo "Version changed"
                   else
@@ -66,10 +66,11 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
+
             - uses: googleapis/release-please-action@v4
               with:
                   token: ${{ secrets.GITHUB_TOKEN }}
-                  release-type: simple
+                  release-type: node
 
     publish-npm:
         needs: release
