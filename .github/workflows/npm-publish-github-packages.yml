@@ -11,8 +11,8 @@ on:
 
 permissions:
     contents: write
-    id-token: write
     pull-requests: write
+    id-token: write
 
 jobs:
     publish:
@@ -62,16 +62,7 @@ jobs:
               id: release
               with:
                   token: ${{ secrets.GITHUB_TOKEN }}
-                  release-type: node
-
-            # - name: Check Release
-            #   run: |
-            #       if [ -z "${{ secrets.NPM_TOKEN }}" ]; then
-            #         echo "NPM_TOKEN is not set"
-            #         exit 1
-            #       else
-            #         echo "NPM_TOKEN is set"
-            #       fi
+                  release-type: simple
 
             - name: Publish to NPM
               if: ${{ steps.release.outputs.release_created }}
