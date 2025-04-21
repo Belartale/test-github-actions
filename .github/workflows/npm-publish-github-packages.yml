@@ -70,8 +70,8 @@ jobs:
                     "https://api.github.com/repos/${{ github.repository }}/releases" \
                     -d '{"tag_name":"v${{ steps.check.outputs.new_version }}","target_commitish":"main","name":"v${{ steps.check.outputs.new_version }}","body":"Automatic release for version ${{ steps.check.outputs.new_version }}","draft":false,"prerelease":false,"generate_release_notes":true}'
 
-            - name: Publish to NPM
-              if: steps.check.outputs.version_changed == 'true'
-              run: npm publish --provenance --access public
-              env:
-                  NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+            # - name: Publish to NPM
+            #   if: steps.check.outputs.version_changed == 'true'
+            #   run: npm publish --provenance --access public
+            #   env:
+            #       NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
