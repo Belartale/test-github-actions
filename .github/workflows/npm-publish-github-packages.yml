@@ -30,7 +30,7 @@ jobs:
               run: npm ci
 
             - name: Check the version
-              id: check
+              id: version
               run: |
                   CURRENT_VERSION=$(jq -r .version package.json)
                   echo "Current version: $CURRENT_VERSION"
@@ -42,15 +42,13 @@ jobs:
                   if [ "$LATEST_VERSION" != "$CURRENT_VERSION" ];
                   then
                   echo "Version changed"
-                  echo "version_changed=true" >> $GITHUB_OUTPUT
-                  echo "new_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
                   else
                   echo "Version not changed"
-                  echo "version_changed=false" >> $GITHUB_OUTPUT
+                  exit 1
                   fi
 
             - name: Check NPM Token
-              id: check_token
+              # id: check_token
               run: |
                   if [ -z "${{ secrets.NPM_TOKEN }}" ]; then
                     echo "NPM_TOKEN is not set"
@@ -64,8 +62,16 @@ jobs:
               with:
                   release-type: node
 
+            - name: Check Release
+              run: |
+                  if [ -z "${{ secrets.NPM_TOKEN }}" ]; then
+                    echo "NPM_TOKEN is not set"
+                    exit 1
+                  else
+                    echo "NPM_TOKEN is set"
+                  fi
+
             - name: Publish to NPM
-              if: steps.check.outputs.version_changed == 'true' && steps.release.outputs.release_created == 'true'
               run: npm publish --provenance --access public
               env:
                   NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
