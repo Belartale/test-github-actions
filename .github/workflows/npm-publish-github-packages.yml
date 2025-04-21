@@ -15,44 +15,33 @@ permissions:
     id-token: write
 
 jobs:
-    check-version:
+    publish:
+        # needs: prev-job
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
 
-            - name: Setup Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: 18
-                  registry-url: https://registry.npmjs.org/
+            - name: Check the version
+              id: version
+              run: |
+                  CURRENT_VERSION=$(jq -r .version package.json)
+                  echo "Current version: $CURRENT_VERSION"
 
-            - name: Install dependencies
-              run: npm ci
+                  LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+                  echo "Latest tag: $LATEST_TAG"
 
-            # - name: Check the version
-            #   id: version
-            #   run: |
-            #       CURRENT_VERSION=$(jq -r .version package.json)
-            #       echo "Current version: $CURRENT_VERSION"
+                  LATEST_VERSION=${LATEST_TAG#v}
 
-            #       LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
-            #       echo "Latest tag: $LATEST_TAG"
+                  if [ "$LATEST_VERSION" != "$CURRENT_VERSION" && "$LATEST_VERSION" != "v0.0.0" ];
+                  then
+                  echo "Version changed"
+                  else
+                  echo "Version not changed"
+                  exit 1
+                  fi
 
-            #       LATEST_VERSION=${LATEST_TAG#v}
-
-            #       if [ "$LATEST_VERSION" != "$CURRENT_VERSION" && "$LATEST_VERSION" != "v0.0.0"];
-            #       then
-            #       echo "Version changed"
-            #       else
-            #       echo "Version not changed"
-            #       exit 1
-            #       fi
-
-    check-tokens-and-variables:
-        needs: check-version
-        runs-on: ubuntu-latest
-        steps:
             - name: Check NPM Token
+              # id: check_token
               run: |
                   if [ -z "${{ secrets.NPM_TOKEN }}" ]; then
                     echo "NPM_TOKEN is not set"
@@ -61,22 +50,11 @@ jobs:
                     echo "NPM_TOKEN is set"
                   fi
 
-    release:
-        needs: check-tokens-and-variables
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v4
-
             - uses: googleapis/release-please-action@v4
+              id: release
               with:
                   token: ${{ secrets.GITHUB_TOKEN }}
                   release-type: node
-
-    publish-npm:
-        needs: release
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v4
 
             - name: Setup Node.js
               uses: actions/setup-node@v4
@@ -88,7 +66,7 @@ jobs:
               run: npm ci
 
             - name: Publish to NPM
-              if: ${{ needs.release.outputs.release_created }}
+              if: ${{ steps.release.outputs.release_created }}
               run: npm publish --provenance --access public
               env:
                   NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
