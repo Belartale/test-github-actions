@@ -6,7 +6,7 @@ name: Npm publish
 on:
     push:
         branches:
-            # - main
+            - main
             - dev1
 
 permissions:
@@ -59,11 +59,13 @@ jobs:
 
             - name: Setup Node.js
               uses: actions/setup-node@v4
+              if: ${{ steps.release.outputs.release_created }}
               with:
                   node-version: 18
                   registry-url: https://registry.npmjs.org/
 
             - name: Install dependencies
+              if: ${{ steps.release.outputs.release_created }}
               run: npm ci
 
             - name: Publish to NPM
