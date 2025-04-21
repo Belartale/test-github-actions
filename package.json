@@ -1,7 +1,7 @@
 {
   "name": "test-belartale-actions",
   "version": "0.1.4",
-  "main": "index.js",
+  "main": "./build/index.js",
   "type": "module",
   "files": [
     "build"
