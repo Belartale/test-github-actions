@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.2](https://github.com/Belartale/test-github-actions/compare/v0.3.1...v0.3.2) (2025-04-24)
+
+
+### Bug Fixes
+
+* correct comment typo in index.js ([c0048b4](https://github.com/Belartale/test-github-actions/commit/c0048b49eaf9d8b9f98edde91a8caf2e8ef37579))
+
 ## [0.3.1](https://github.com/Belartale/test-github-actions/compare/v0.3.0...v0.3.1) (2025-04-22)
 
 
